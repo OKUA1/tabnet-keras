@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tabnet_keras"
+version = "1.0.0"
+authors = [
+  { name="Oleg K", email="lookout_errands0z@icloud.com" },
+]
+description = "A tf2 keras implementation of tabnet"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/OKUA1/tabnet-keras"
+"Bug Tracker" = "https://github.com/OKUA1/tabnet-keras/issues"
