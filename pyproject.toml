@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tabnet_keras"
-version = "1.0.0"
+version = "1.1.0"
 authors = [
   { name="Oleg K", email="lookout_errands0z@icloud.com" },
 ]

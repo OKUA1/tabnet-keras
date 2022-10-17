@@ -6,7 +6,7 @@ https://github.com/jeyabbalas/tabnet
 ## Installation 
 
 ```bash
-$ pip install git+https://github.com/OKUA1/tabnet-keras
+$ pip install tabnet_keras
 ```
 
 ## Usage
