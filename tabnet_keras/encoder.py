@@ -15,7 +15,7 @@ class TabNetEncoder(tf.keras.layers.Layer):
         n_dependent_glus: int = 2, 
         relaxation_factor: float = 1.3, 
         epsilon: float = 1e-15, 
-        virtual_batch_size: Optional[int] = None, 
+        virtual_batch_splits: Optional[int] = None, 
         momentum: float = 0.98, 
         mask_type: str = "sparsemax", 
         lambda_sparse: float = 1e-3, 
@@ -51,11 +51,9 @@ class TabNetEncoder(tf.keras.layers.Layer):
             to tune in TabNets. Default (1.3).
         epsilon: float
             Prevent computing log(0) by adding a small constant log(0+epsilon). Default (1e-15).
-        virtual_batch_size: int
-            Batch size for Ghost Batch Normalization (GBN). Value should be much smaller 
-            than and a factor of the overall batch size. Default (None) runs regular batch 
-            normalization. If an integer value is specified, GBN is run with that virtual 
-            batch size.
+        virtual_batch_splits: int
+            Number of splits for ghost batch normalization. Preferrably should divide the batch size. Otherwise, 
+            the last virtual batch is not used for batch_norm training.
         momentum: float
             Momentum for exponential moving average in batch normalization. Lower values 
             correspond to larger impact of batch on the rolling statistics computed in 
@@ -75,7 +73,7 @@ class TabNetEncoder(tf.keras.layers.Layer):
         self.n_dependent_glus = n_dependent_glus
         self.relaxation_factor = relaxation_factor
         self.epsilon = epsilon
-        self.virtual_batch_size = virtual_batch_size
+        self.virtual_batch_splits = virtual_batch_splits
         self.momentum = momentum
         self.mask_type = mask_type
         self.lambda_sparse = lambda_sparse
@@ -94,7 +92,7 @@ class TabNetEncoder(tf.keras.layers.Layer):
             n_dependent_glus=self.n_dependent_glus, 
             shared_glu_fc_layers=self.shared_glu_fc_layers, 
             units=self.glu_dim, 
-            virtual_batch_size=self.virtual_batch_size, 
+            virtual_batch_splits=self.virtual_batch_splits, 
             momentum=self.momentum, 
             name="FeatureTransformer_Step_0", 
         )
@@ -113,7 +111,7 @@ class TabNetEncoder(tf.keras.layers.Layer):
                 n_dependent_glus=self.n_dependent_glus, 
                 shared_glu_fc_layers=self.shared_glu_fc_layers, 
                 units=self.glu_dim, 
-                virtual_batch_size=self.virtual_batch_size, 
+                virtual_batch_splits=self.virtual_batch_splits, 
                 momentum=self.momentum, 
                 name=f"FeatureTransformer_Step_{(step+1)}", 
             )
@@ -122,7 +120,7 @@ class TabNetEncoder(tf.keras.layers.Layer):
                 n_steps=self.n_steps, 
                 epsilon=self.epsilon, 
                 lambda_sparse=self.lambda_sparse, 
-                virtual_batch_size=self.virtual_batch_size, 
+                virtual_batch_splits=self.virtual_batch_splits, 
                 momentum=self.momentum, 
                 mask_type = self.mask_type, 
                 name=f"AttentiveTransformer_Step_{(step+1)}", 

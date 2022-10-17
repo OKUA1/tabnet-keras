@@ -1,6 +1,8 @@
 from typing import Dict, List, Tuple, Optional, Union
 import tensorflow as tf
 from tabnet_keras.activations.sparsemax import sparsemax
+from tabnet_keras.gbn import GhostBatch1DNormalization
+
 
 class AttentiveTransformer(tf.keras.layers.Layer):
     def __init__(
@@ -9,7 +11,7 @@ class AttentiveTransformer(tf.keras.layers.Layer):
         n_steps: int = 3, 
         epsilon: float = 1e-15, 
         lambda_sparse: float = 1e-3, 
-        virtual_batch_size: Optional[int] = None,  #not used due to incorrect behaviour 
+        virtual_batch_splits: Optional[int] = None, 
         momentum: float = 0.98, 
         mask_type: str = "sparsemax", 
         **kwargs
@@ -32,7 +34,7 @@ class AttentiveTransformer(tf.keras.layers.Layer):
         lambda_sparse: float
             Coefficient for the mask sparsity loss. Important parameter to tune. Lower values 
             lead to better performance. Default (1e-3).
-        virtual_batch_size: int
+        virtual_batch_splits: int
             Batch size for Ghost Batch Normalization (GBN). Value should be much smaller 
             than and a factor of the overall batch size. Default (None) runs regular batch 
             normalization. If an integer value is specified, GBN is run with that virtual 
@@ -56,7 +58,10 @@ class AttentiveTransformer(tf.keras.layers.Layer):
         # attentive transformer layers
         self.fc = tf.keras.layers.Dense(units, use_bias=False)
 
-        self.bn = tf.keras.layers.BatchNormalization(momentum=momentum)
+        if virtual_batch_splits is not None: 
+            self.bn = GhostBatch1DNormalization(momentum=momentum, virtual_batch_splits = virtual_batch_splits)
+        else: 
+            self.bn = tf.keras.layers.BatchNormalization(momentum=momentum)
 
         if mask_type == "sparsemax":
             self.sparse_activation = sparsemax
@@ -66,7 +71,7 @@ class AttentiveTransformer(tf.keras.layers.Layer):
             self.sparse_activation = tf.nn.softmax
         else:
             raise NotImplementedError(
-                "Available options for mask_type: {'sparsemax', 'softmax'}"
+                "Available options for mask_type: {'sparsemax', 'softmax', ...}"
             )
         
     def call(self, inputs: tf.Tensor, prior: tf.Tensor, training: Optional[bool] = None) -> tf.Tensor:

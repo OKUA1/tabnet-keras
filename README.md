@@ -24,7 +24,8 @@ tabnet_params = {
     "epsilon": 1e-15,
     "momentum": 0.98,
     "mask_type": "sparsemax", # can be 'sparsemax' or 'softmax'
-    "lambda_sparse": 1e-3
+    "lambda_sparse": 1e-3, 
+    "virtual_batch_splits": 8 #number of splits for ghost batch normalization, ideally should evenly divide the batch_size
 }
 
 ### Regression 

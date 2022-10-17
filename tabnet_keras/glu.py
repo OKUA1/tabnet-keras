@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple, Optional, Union
 import tensorflow as tf
+from tabnet_keras.gbn import GhostBatch1DNormalization
 
 class GLULayer(tf.keras.layers.Layer):
     def __init__(
@@ -7,7 +8,7 @@ class GLULayer(tf.keras.layers.Layer):
             units: int = 16, 
             fc_layer: Optional[tf.keras.layers.Dense] = None,
             momentum: float = 0.98,
-            virtual_batch_size = None, #not used due to incorrect behaviour 
+            virtual_batch_splits: Optional[int] = None,
             **kwargs
     ):
         """
@@ -26,6 +27,10 @@ class GLULayer(tf.keras.layers.Layer):
             Momentum for exponential moving average in batch normalization. Lower values 
             correspond to larger impact of batch on the rolling statistics computed in 
             each batch. Valid values range from 0.0 to 1.0. Default (0.98).
+        virtual_batch_splits: int
+            Number of splits for ghost batch normalization. Preferrably should divide the batch size. Otherwise, 
+            the last virtual batch is not used for batch_norm training.
+        
         """
         super(GLULayer, self).__init__(**kwargs)
         self.units = units
@@ -35,9 +40,12 @@ class GLULayer(tf.keras.layers.Layer):
             self.fc = fc_layer
         else:
             self.fc = tf.keras.layers.Dense(self.units*2, use_bias=False)
-        
-        self.bn = tf.keras.layers.BatchNormalization(momentum=self.momentum)
-    
+
+        if virtual_batch_splits is not None: 
+            self.bn = GhostBatch1DNormalization(momentum=self.momentum, virtual_batch_splits = virtual_batch_splits)
+        else: 
+            self.bn = tf.keras.layers.BatchNormalization(momentum=self.momentum)
+
     def call(self, inputs: tf.Tensor, training: Optional[bool] = None) -> tf.Tensor:
         x = self.fc(inputs)
         x = self.bn(x, training=training)

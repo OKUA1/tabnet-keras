@@ -8,7 +8,7 @@ class FeatureTransformer(tf.keras.layers.Layer):
             n_dependent_glus: int = 2, 
             shared_glu_fc_layers: Optional[List[tf.keras.layers.Dense]] = None, 
             units: int = 16, 
-            virtual_batch_size: Optional[int] = None, 
+            virtual_batch_splits: Optional[int] = None, 
             momentum: float = 0.98, 
             **kwargs
     ):
@@ -26,11 +26,9 @@ class FeatureTransformer(tf.keras.layers.Layer):
             in this feature transformer is len(shared_glu_layers) + n_dependent_glus.
         units: int
             Number of units in each GLU layer. Default (16).
-        virtual_batch_size: int
-            Batch size for Ghost Batch Normalization (GBN). Value should be much smaller 
-            than and a factor of the overall batch size. Default (None) runs regular batch 
-            normalization. If an integer value is specified, GBN is run with that virtual 
-            batch size.
+        virtual_batch_splits: int
+            Number of splits for ghost batch normalization. Preferrably should divide the batch size. Otherwise, 
+            the last virtual batch is not used for batch_norm training.
         momentum: float
             Momentum for exponential moving average in batch normalization. Lower values 
             correspond to larger impact of batch on the rolling statistics computed in 
@@ -55,7 +53,7 @@ class FeatureTransformer(tf.keras.layers.Layer):
             glu_layer = GLULayer(
                 units=self.units, 
                 fc_layer=fc_layer, 
-                virtual_batch_size=virtual_batch_size, 
+                virtual_batch_splits=virtual_batch_splits, 
                 momentum=momentum, 
             )
             self.glu_layers.append(glu_layer)

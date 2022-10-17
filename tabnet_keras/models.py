@@ -16,7 +16,7 @@ class TabNetClassifier(tf.keras.Model):
         n_dependent_glus: int = 2,
         relaxation_factor: float = 1.3,
         epsilon: float = 1e-15,
-        virtual_batch_size: Optional[int] = None,  # not used
+        virtual_batch_splits: Optional[int] = None, 
         momentum: float = 0.98,
         mask_type: str = "sparsemax",
         lambda_sparse: float = 1e-3,
@@ -57,8 +57,9 @@ class TabNetClassifier(tf.keras.Model):
             to tune in TabNets. Default (1.3).
         epsilon: float
             Prevent computing log(0) by adding a small constant log(0+epsilon). Default (1e-15).
-        virtual_batch_size: int
-            Not used for not due to incorrect behaviour
+        virtual_batch_splits: int
+            Number of splits for ghost batch normalization. Preferrably should divide the batch size. Otherwise, 
+            the last virtual batch is not used for batch_norm training.
         momentum: float
             Momentum for exponential moving average in batch normalization. Lower values 
             correspond to larger impact of batch on the rolling statistics computed in 
@@ -81,7 +82,7 @@ class TabNetClassifier(tf.keras.Model):
                                     n_dependent_glus = n_dependent_glus,
                                     relaxation_factor = relaxation_factor,
                                     epsilon = epsilon,
-                                    virtual_batch_size = virtual_batch_size,
+                                    virtual_batch_splits = virtual_batch_splits,
                                     momentum = momentum,
                                     mask_type = mask_type,
                                     lambda_sparse = lambda_sparse,
@@ -109,7 +110,7 @@ class TabNetRegressor(tf.keras.Model):
         n_dependent_glus: int = 2,
         relaxation_factor: float = 1.3,
         epsilon: float = 1e-15,
-        virtual_batch_size: Optional[int] = None,  # not used
+        virtual_batch_splits: Optional[int] = None,  
         momentum: float = 0.98,
         mask_type: str = "sparsemax",
         lambda_sparse: float = 1e-3,
@@ -147,8 +148,9 @@ class TabNetRegressor(tf.keras.Model):
             to tune in TabNets. Default (1.3).
         epsilon: float
             Prevent computing log(0) by adding a small constant log(0+epsilon). Default (1e-15).
-        virtual_batch_size: int
-            Not used for not due to incorrect behaviour
+        virtual_batch_splits: int
+            Number of splits for ghost batch normalization. Preferrably should divide the batch size. Otherwise, 
+            the last virtual batch is not used for batch_norm training.
         momentum: float
             Momentum for exponential moving average in batch normalization. Lower values 
             correspond to larger impact of batch on the rolling statistics computed in 
@@ -171,7 +173,7 @@ class TabNetRegressor(tf.keras.Model):
                                     n_dependent_glus = n_dependent_glus,
                                     relaxation_factor = relaxation_factor,
                                     epsilon = epsilon,
-                                    virtual_batch_size = virtual_batch_size,
+                                    virtual_batch_splits = virtual_batch_splits,
                                     momentum = momentum,
                                     mask_type = mask_type,
                                     lambda_sparse = lambda_sparse,
@@ -179,7 +181,7 @@ class TabNetRegressor(tf.keras.Model):
 
         
         self.clf = tf.keras.layers.Dense(
-            n_regressors, use_bias=False, name='regressor')
+            n_regressors, use_bias=False, name='regressor')     
 
     def call(self, inputs, training=None):
         self.activations = self.tabnet_encoder(inputs, training=training)
