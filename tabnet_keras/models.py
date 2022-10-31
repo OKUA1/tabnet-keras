@@ -1,6 +1,7 @@
 from typing import Dict, List, Tuple, Optional, Union, Callable
 import tensorflow as tf
 from tabnet_keras.encoder import TabNetEncoder
+from tabnet_keras.decoder import TabNetDecoder
 
 
 class TabNetClassifier(tf.keras.Model):
@@ -187,3 +188,16 @@ class TabNetRegressor(tf.keras.Model):
         self.activations = self.tabnet_encoder(inputs, training=training)
         out = self.clf(self.activations)
         return out
+
+class TabNetAutoEncoder(tf.keras.Model):
+    
+    
+    def __init__(self, encoder_kwargs, decoder_kwargs, **kwargs): 
+
+        super(TabNetAutoEncoder, self).__init__(**kwargs)
+        self.encoder = TabNetEncoder(**encoder_kwargs)
+        self.decoder = TabNetDecoder(**decoder_kwargs)
+        
+
+    def call(self, inputs): 
+        return self.decoder(self.encoder(inputs))

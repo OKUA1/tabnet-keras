@@ -1,4 +1,4 @@
-from tabnet_keras.models import TabNetClassifier, TabNetRegressor
+from tabnet_keras.models import TabNetClassifier, TabNetRegressor, TabNetAutoEncoder
 
 __all__ = ['TabNetClassifier', 'TabNetRegressor']
 
