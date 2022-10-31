@@ -76,12 +76,12 @@ class TabNetDecoder(tf.keras.layers.Layer):
 
 
     def call(self, inputs):
-
-        reconstruction = tf.zeros_like(inputs)
+        
+        reconstruction = []
 
         for step in range(self.n_steps):
             x = self.ft[step](inputs)
             x = self.fc[step](x)
-            reconstruction += x
+            reconstruction.append(x)
         
-        return reconstruction
+        return tf.reduce_sum(reconstruction, axis = 0)
