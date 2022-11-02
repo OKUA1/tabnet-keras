@@ -2,4 +2,4 @@ from tabnet_keras.models import TabNetClassifier, TabNetRegressor, TabNetAutoEnc
 
 __all__ = ['TabNetClassifier', 'TabNetRegressor']
 
-__version__ = '1.1.0'
+__version__ = '1.2.0'

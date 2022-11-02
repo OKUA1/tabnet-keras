@@ -1,7 +1,6 @@
 # TF2 Keras implementation of TabNet
 
-Most of the code is taken with minor changes from this repository:
-https://github.com/jeyabbalas/tabnet
+TabNet is a novel deep learning architecture for **tabular data**. TabNet performs reasoning in multiple decision steps and using sequential attention to select which features to use at which decision step. You can find more information about it in the original [research paper](https://arxiv.org/abs/1908.07442).
 
 ## Installation 
 
@@ -41,3 +40,6 @@ model.fit(X, y, epochs = 100, batch_size = 1024)
 
 ```
 
+## Acknowledgment
+
+Most of the code is taken with minor changes from [this repository](https://github.com/jeyabbalas/tabnet).
